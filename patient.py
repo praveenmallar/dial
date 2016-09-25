@@ -9,6 +9,7 @@ class Patient (Frame):
 		if not parent:
 			parent=Toplevel()
 		Frame.__init__(self,parent)
+		self.id=None
 		self.pack()
 		Label(self,text="Patient",font="Halvetica 12 bold").pack(pady=10)
 		f1=Frame(self)
@@ -31,6 +32,7 @@ class Patient (Frame):
 		Entry(f2,textvariable=self.note).grid(row=3,column=1,padx=5,pady=5)
 		f3=Frame(self)
 		f3.pack(pady=15)
+		Button(f3,text="Delete",command=self.delete).pack(side=LEFT,padx=15)
 		Button(f3,text="Update",command=self.update).pack(side=LEFT,padx=15)
 		Button(f3,text="Add New",command=self.addnew).pack(side=LEFT,padx=15)
 		self.patients.bind("<<listChanged>>",self.patientChanged)
@@ -39,7 +41,7 @@ class Patient (Frame):
 	def fillPatients(self):
 		con=cdb.Db().connection()
 		cur=con.cursor()
-		sql="select name,id,address,phone,note from patient;"
+		sql="select name,id,address,phone,note from patient order by name;"
 		cur.execute(sql)
 		rows=cur.fetchall()
 		items=[]
@@ -53,34 +55,51 @@ class Patient (Frame):
 		self.address.set(patient[2])
 		self.phone.set(patient[3])
 		self.note.set(patient[4])
+		self.id=patient[1]
+	
+	def addnew(self):
+		self.id=None
+		self.name.set("")
+		self.address.set("")
+		self.phone.set("")
+		self.note.set("")
+
+	def delete(self):
+		if self.id:
+			id=self.id
+			name=self.name.get()
+			if not tmb.askyesno("Confirm","Delete Patient {}?".format(name),parent=self.master):
+				return
+			con=cdb.Db().connection()
+			cur=con.cursor()
+			cur.execute("delete from patient where id=%s;",(id))
+			con.commit()
+			tmb.showinfo("Deleted","Patient deleted", parent=self.master)
+			self.fillPatients()
 
 	def update(self):
-		id=self.patients.get()[1][1]
 		index=self.patients.index()
+		id=self.id
+		name=self.name.get()
 		address=self.address.get()
 		phone=self.phone.get()
 		note=self.note.get()
 		con=cdb.Db().connection()
 		cur=con.cursor()
-		sql="update patient set address=%s, phone=%s,note=%s where id=%s;"
-		cur.execute(sql,(address,phone,note,id))
-		con.commit()
+		try:
+			if not id:
+				if not tmb.askyesno("Confirm","Add new Patient?",parent=self.master):
+					return
+				cur.execute("insert into patient(name,address,phone,note) values(%s,%s,%s,%s);",(name,address,phone,note))
+			else:
+				cur.execute("update patient set address=%s, phone=%s,note=%s where id=%s;",(address,phone,note,id))
+			con.commit()		
+		except Exception as e:
+			tmb.showerror("Error "+str(e.args[0]),e.args[1],parent=self.master)
+			return
 		self.fillPatients()
 		self.patients.see(index)
-		tmb.showinfo("Done","Details updated")
-
-	def addnew(self):
-		name=self.name.get()
-		if not tmb.askyesno("Confirm","Add new Patient?"):
-			return
-		address=self.address.get()
-		phone=self.phone.get()
-		note=self.note.get()
-		con=cdb.Db().connection()
-		cur=con.cursor()
-		sql="insert into patient(name,address,phone,note) values(%s,%s,%s,%s);"
-		cur.execute(sql,(name,address,phone,note))
-		con.commit()
+		tmb.showinfo("Done","Details updated",parent=self.master)
 
 if __name__=="__main__":
 	a=Patient(	)

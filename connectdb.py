@@ -4,6 +4,7 @@ import MySQLdb.cursors as mdbcur
 from Tkinter import *
 
 dictcursor=mdbcur.DictCursor
+IntegrityError=mdb.IntegrityError
 
 class Db:
  """connects by default to mysql."""
