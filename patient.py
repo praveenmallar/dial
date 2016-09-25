@@ -94,7 +94,7 @@ class Patient (Frame):
 			else:
 				cur.execute("update patient set address=%s, phone=%s,note=%s where id=%s;",(address,phone,note,id))
 			con.commit()		
-		except Exception as e:
+		except cdb.IntegrityError as e:
 			tmb.showerror("Error "+str(e.args[0]),e.args[1],parent=self.master)
 			return
 		self.fillPatients()
