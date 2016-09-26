@@ -5,6 +5,7 @@ import calpicker
 import tkMessageBox
 import printer as printbill
 import shelve
+import dayreport
 
 class addStock(Frame):
 
@@ -178,6 +179,7 @@ class addStock(Frame):
 			printout.append(" ")
 			printout.extend(["net total: "+str(billtotal),"bill total: "+total,"",""])
 			printbill.printinfo(printout)
+			dayreport.dayrep.spend("purchase:"+stockist,total,nocash=True)
 			sh=shelve.open("data.db")
 			try:
 				curpurchase=sh['purchase']

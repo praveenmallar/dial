@@ -5,6 +5,7 @@ import datetime as dt
 import tkMessageBox as tmb
 from tkFont import Font
 import printer
+import dayreport
 
 class Bill (Frame):
 	def __init__(self,parent=None):
@@ -198,6 +199,7 @@ class Bill (Frame):
 				if count > 0:
 					raise cdb.mdb.Error(420, "not enough stock of " +item[3] )
 			cur.execute("update bill set amount=%s where id=%s;",(billtotal,billid))
+			dayreport.dayrep.receive("bill:"+patient[1],billtotal)
 			donor=None			
 			donor=self.sponsors.get()
 			if donor:

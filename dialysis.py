@@ -5,6 +5,7 @@ import shelve
 import tkMessageBox 
 import connectdb as cdb
 import datetime as dt
+import dayreport
 
 class Dialysis():
 	def __init__(self):
@@ -59,8 +60,12 @@ class Dialysis():
 		self.debug.set(noprinter)
 		
 		repmenu=Menu(menu,tearoff=0)
-		repmenu.add_command(label="Day Report",command=self.dayreport)
+		monthsalemenu=Menu(repmenu,tearoff=0)
+		monthsalemenu.add_command(label="previous month",command=lambda x=-1:self.lastmonthbal(x))
+		monthsalemenu.add_command(label="current month",command=lambda x=0:self.lastmonthbal(x))
+		repmenu.add_command(label="Day close",command=self.dayclose)
 		repmenu.add_command(label="Last Month Report",command=self.monthreport)
+		repmenu.add_cascade(label="Month Balance",menu=monthsalemenu)		
 		menu.add_cascade(label="Report",menu=repmenu)
 
 		viewmenu=Menu(menu,tearoff=0)
@@ -84,11 +89,20 @@ class Dialysis():
 			return
 		editstock.EditStock()
 
-	def dayreport(self):
+	def dayclose(self):
 		if not password.askpass():
 			tkMessageBox.showerror("wrong password","try again")
 			return
-	
+		dayreport.dayrep.day_close()
+
+	def lastmonthbal(self,mon):
+		if not password.askpass():
+			return
+		d=dt.date.today()
+		if mon==-1:
+			d = d.replace(day=1) - dt.timedelta(days=1)
+		dayreport.dayrep.print_monthreport(d)		
+
 	def monthreport(self):
 		if not password.askpass("admin"):
 			tkMessageBox.showerror("error","wrong password")
