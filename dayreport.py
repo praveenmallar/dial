@@ -3,6 +3,7 @@ db="dayreport.db"
 import datetime, calendar
 import tkMessageBox as tmb
 import Tkinter
+import printer
 
 class dayreport:
 	def __init__(self):
@@ -20,6 +21,8 @@ class dayreport:
 			self.rep=[]
 		if len(self.rep)==0:
 			b=self.get("closing balance")
+			if b=="":
+				b=0
 			self.bal=0
 			self.receive("opening balance",b)	
 
@@ -50,39 +53,42 @@ class dayreport:
 	def receive(self,head,amount,nocash=False):
 		if not nocash:
 			self.bal+=float(amount)
-		self.rep.append([head,float(amount),0,self.bal])
+		self.rep.append([head,float(amount),self.bal])
 		self.put("balance",self.bal)
 		self.put("dayreport",self.rep)
 
 	def spend(self,head,amount,nocash=False):
 		if not nocash:
 			self.bal-=float(amount)
-		self.rep.append([head,0,float(amount),self.bal])
+		self.rep.append([head,0-float(amount),self.bal])
 		self.put("balance",self.bal)
 		self.put("dayreport",self.rep)
 
 	def print_dayreport(self,day):
 		d=day.strftime("%Y%m%d")
 		rep=self.get(d)
+		lines=["Day closing report "+d]
 		for r in rep:
-			print "{:20.20s}{:8.2f}{:8.2f}{:10.2f}".format(*r)
+			lines.append( "{:20.20s}{:10.2f}{:10.2f}".format(*r))
+		printer.printinfo(lines)
 
 	def print_monthreport(self,day):
 		numdays=calendar.monthrange(day.year,day.month)[1]
 		days=[datetime.date(day.year,day.month,d) for d in range(1,numdays+1)]
-		print "{:10.10s}{:10.10s}{:10.10s}".format("date","op_balance","cl_balance")
+		lines=[]
+		lines.append( "{:10.10s}{:10.10s}{:10.10s}".format("date","op_balance","cl_balance"))
 		for d in days:
 			dd=d.strftime("%Y%m%d")
 			rep=self.get(dd)
 			op=""
 			cl=""
 			for line in rep:
-				if line[0]=="opening balance": 
-					op=line[3]
+				if line[0]=="opening balance" and op=="": 
+					op=line[2]
 				if line[0]=="closing balance": 
-					cl=line[3]
-			print "{:10.10s}{:>10.10s}{:>10.10s}".format(d.strftime("%d %b,%y"),str(op),str(cl))
-
+					cl=line[2]
+			lines.append( "{:10.10s}{:>10.10s}{:>10.10s}".format(d.strftime("%d %b,%y"),str(op),str(cl)))
+		printer.printinfo(lines)
 
 
 dayrep=dayreport()

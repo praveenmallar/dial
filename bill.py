@@ -208,8 +208,9 @@ class Bill (Frame):
 					raise cdb.mdb.Error(420,"not enough donation with the sponsor "+donor[1])
 				cur.execute("update donor set value=%s where id=%s;",(donor[2]-billtotal,donor[0]))
 				cur.execute("insert into sponsorship (donor,bill) values(%s,%s);",(donor[0],billid))
-				billtotal=0
 				donor=donor[1]
+				dayreport.dayrep.spend("spnsr:"+donor,billtotal)
+				billtotal=0
 			con.commit()	
 			date=date.strftime("%e-%b-%y")
 			printer.printbill(billid,patient[1],donor,date,billtotal,lines)

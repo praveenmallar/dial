@@ -4,6 +4,7 @@ import connectdb as cdb
 import tkMessageBox as tmb
 import datetime as dt
 import printer
+import dayreport
 
 
 class Donor (Frame):
@@ -125,6 +126,7 @@ class Donor (Frame):
 			lines.extend(["Received Rs "+"{:5.2f}".format(value), "with thanks from "+donor[0]])
 			lines.extend(["towards sponsoship for dialysis for needy patients"," ", "Thank you"])
 			printer.printinfo(lines)
+			dayreport.dayrep.receive("donation:"+donor[0],float(value))
 		except Exception as e:
 			tmb.showinfo("Error ",str(e))
 			con.rollback()
