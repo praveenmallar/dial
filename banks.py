@@ -1,6 +1,7 @@
 from Tkinter import *
 import connectdb as cdb
 import comp
+import tkMessageBox as tmb
 
 
 class banks(Frame):
@@ -27,6 +28,7 @@ class banks(Frame):
 
 
 	def fillbanks(self):
+		i=self.banks.index()
 		cur=cdb.Db().connection().cursor()
 		cur.execute("select * from banks order by name")
 		rows=cur.fetchall()
@@ -34,6 +36,7 @@ class banks(Frame):
 		for r in rows:
 			items.append([r[1],r])
 		self.banks.changelist(listitems=items)
+		self.banks.see(i)
 
 	def bank_details(self,e=None):
 		b=self.banks.get()[1]
@@ -42,12 +45,34 @@ class banks(Frame):
 		self.bank_phone.set(b[3])
 
 	def update_bank(self):
-		pass
+		b=self.banks.get()[1][0]
+		ph=self.bank_phone.get()
+		ad=self.bank_addr.get()
+		con=cdb.Db().connection()
+		cur=con.cursor()
+		try:
+			cur.execute("update banks set address=%s, phone=%s where id=%s;",(ad,ph,b))
+			con.commit()
+		except Exception as e:
+			tmb.showerror("Error!",e.args,parent=self.master)
+		self.fillbanks()
 
 	def bank_new(self):
-		pass
-
+		b=self.bank_name.get()
+		ph=self.bank_phone.get()
+		ad=self.bank_addr.get()
+		if not tmb.askyesno("Confirm","Add new bank {}".format(b),parent=self.master):
+			return
+		con=cdb.Db().connection()
+		cur=con.cursor()
+		try:
+			cur.execute("insert into banks(name,phone,address) values(%s,%s,%s);",(b,ph,ad))
+			con.commit()
+		except Exception as e:
+			tmb.showerror("Error!",e.args,parent=self.master)
+		self.fillbanks()
 
 if __name__=="__main__":
-	b=banks()
+	t=Tk()
+	b=banks(t)
 	b.mainloop()
