@@ -26,6 +26,17 @@ class banks(Frame):
 		self.fillbanks()
 		self.banks.bind("<<listChanged>>",self.bank_details)
 
+		f2=Frame(self,bd=1,relief=RAISED)
+		f2.pack(side=TOP,expand=1)
+		self.bank_label=StringVar()
+		Label(f2,height=2,padx=10,pady=2,textvariable=self.bank_label).pack(side=TOP)
+		Label(f2,text="new transaction").pack()
+		f=Frame(f2)
+		f.pack()
+		Label(f,text="amount").grid(row=0,column=0)
+		self.trans_amount=DoubleVar()
+		comp.NumEntry(f,textvariable=self.trans_amount).grid(row=0,column=1)
+
 
 	def fillbanks(self):
 		i=self.banks.index()
@@ -43,6 +54,7 @@ class banks(Frame):
 		self.bank_name.set(b[1])
 		self.bank_addr.set(b[2])
 		self.bank_phone.set(b[3])
+		self.bank_label.set(b[1])
 
 	def update_bank(self):
 		b=self.banks.get()[1][0]
