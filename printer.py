@@ -81,7 +81,7 @@ class printer:
 		f.write	(output)
 		f.close()
 
-def printbill(billno,patient,sponsor,date,total,items,ip=None,selfbill=0):
+def printbill(billno,patient,sponsor,date,total,items,ip=None,selfbill=0,credit=False):
 	p=printer()
 	if selfbill==1:
 		p.text("selfbill")
@@ -96,7 +96,8 @@ def printbill(billno,patient,sponsor,date,total,items,ip=None,selfbill=0):
 		p.blank(1)
 		p.blank()
 		p.text("Bill number: "+str(billno))
-	p.text("Patient: "+patient)	
+	p.text("Patient: "+patient)
+	if credit:p.text("**CREDIT bill**")	
 	if sponsor:p.text("Sponsor: "+sponsor)
 	if ip:p.text("IP #"+str(ip))
 	p.text("date: "+str(date))
@@ -108,7 +109,10 @@ def printbill(billno,patient,sponsor,date,total,items,ip=None,selfbill=0):
 	if blanklines>0:
 		p.blank(blanklines)
 	p.bold()
-	p.text('  {:30s}{:7.2f}'.format("TOTAL: ",total))
+	if credit:
+		p.text('  {:30s}{:7.2f}'.format("TOTAL: (credit) ",total))
+	else:
+		p.text('  {:30s}{:7.2f}'.format("TOTAL: ",total))
 	p.no_bold()
 	p.blank(2)
 	p.align_right()	

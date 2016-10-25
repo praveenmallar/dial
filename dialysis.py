@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from Tkinter import *
-import bill,donor,patient,purchase,service,password,printer,editstock,review,new
+import bill,donor,patient,purchase,service,password,printer,editstock,review,new,banks
 import shelve
 import tkMessageBox 
 import connectdb as cdb
@@ -72,6 +72,10 @@ class Dialysis():
 		viewmenu.add_command(label="print stockists list", command=self.liststockists)
 		viewmenu.add_command(label="review bills",command=self.reviewbills)
 		menu.add_cascade(label="View",menu=viewmenu)
+
+		taskmenu=Menu(menu,tearoff=0)
+		taskmenu.add_command(label="Banks",command=lambda:banks.banks())
+		menu.add_cascade(label="Tasks",menu=taskmenu)
 
 		adminmenu=Menu(menu,tearoff=0)
 		adminmenu.add_command(label="Pay Stockists",command=self.purchasepay)

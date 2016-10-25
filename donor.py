@@ -74,9 +74,7 @@ class Donor (Frame):
 		e.bind("<Return>",self.printsponsorlist)
 		Label(ff,text="lines").pack(side=LEFT)
 
-
 		self.changelist()
-		
 
 	def changelist(self,e=None):
 		con=cdb.Db().connection()

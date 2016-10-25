@@ -60,6 +60,8 @@ class Bill (Frame):
 		self.canvas=Canvas(f5,bd=1,relief=SUNKEN,yscrollcommand=sb.set,width=300,height=300)
 		self.canvas.pack()
 		sb.config(command=self.canvas.yview)
+		self.credit=IntVar()
+		Checkbutton(f4,text="credit",command=self.check_credit,variable=self.credit).pack(side=LEFT,pady=20,padx=20)
 		Button(f4,text="Save\nBill",command=self.bill).pack(pady=20)
 
 		self.fillpatients()
@@ -199,10 +201,15 @@ class Bill (Frame):
 				if count > 0:
 					raise cdb.mdb.Error(420, "not enough stock of " +item[3] )
 			cur.execute("update bill set amount=%s where id=%s;",(billtotal,billid))
-			dayreport.dayrep.receive("bill:"+patient[1],billtotal)
+			credit=False
+			if self.credit.get()==1:
+				credit=True
+				cur.execute("insert into credit(bill) values(%s);",(billid))
+			if not credit:
+				dayreport.dayrep.receive("bill:"+patient[1],billtotal)
 			donor=None			
 			donor=self.sponsors.get()
-			if donor:
+			if donor and not credit:
 				donor=donor[1]
 				if not donor[2]>billtotal:
 					raise cdb.mdb.Error(420,"not enough donation with the sponsor "+donor[1])
@@ -211,15 +218,17 @@ class Bill (Frame):
 				donor=donor[1]
 				dayreport.dayrep.spend("spnsr:"+donor,billtotal)
 				billtotal=0
+			if credit:donor=None
 			con.commit()	
 			date=date.strftime("%e-%b-%y")
-			printer.printbill(billid,patient[1],donor,date,billtotal,lines)
+			printer.printbill(billid,patient[1],donor,date,billtotal,lines,credit=credit)
 
 			self.items=[]
 			self.refreshcanvas()
 			self.fillpatients()
 			self.fillsponsors()
 			self.fillproducts()
+			self.credit.set(0)
 
 		except cdb.mdb.Error as e:
 			tmb.showerror("Error","error %d: %s" %(e.args[0],e.args[1]),parent=self.master)
@@ -250,6 +259,11 @@ class Bill (Frame):
 		else:
 			txt=""
 		self.productdetails.set(txt)
+
+	def check_credit(self,event=None):
+		if self.credit.get()==1:
+			if not tmb.askyesno("Confirm","make this a credit bill?",parent=self.master):
+				self.credit.set(0)
 
 if __name__=="__main__":
 	b=Bill()
