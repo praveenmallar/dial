@@ -50,7 +50,7 @@ class InvList(Frame):
 
 	def reload(self):
 		cur=cdb.Db().connection().cursor()
-		sql="select * from service;"
+		sql="select * from service order by name;"
 		cur.execute(sql)
 		rows=cur.fetchall()
 		temp=[]

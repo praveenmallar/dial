@@ -160,8 +160,8 @@ class Bill (Frame):
 				product = item.product
 				count=item.count
 				if product[2]==2:		#service
-					sql="insert into services (service,bill) values(%s,%s);"
-					cur.execute(sql,(product[0],billid))
+					sql="insert into services (service,bill,rate) values(%s,%s,%s);"
+					cur.execute(sql,(product[1],billid,product[4]))
 					billtotal+=product[4]
 					lines.append([product[1],product[4]])
 					sql="select products.id,productservice.count,products.name "\

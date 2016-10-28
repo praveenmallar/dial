@@ -6,6 +6,16 @@ import Tkinter
 import printer
 
 class dayreport:
+
+	'''usage:
+		import dayreport
+		dayreport.dayrep.spend(head,amount)
+		dayreport.dayrep.receive(head,amount)
+		dayreport.dayrep.day_close()
+		dayreport.dayrep.print_dayreport(datetime.date)
+		dayreport.dayrep.print_monthreport(datetime.date)
+	'''
+
 	def __init__(self):
 		self.db=shelve.open(db)
 		self.refresh()
