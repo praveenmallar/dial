@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from Tkinter import *
-import bill,donor,patient,purchase,service,password,printer,editstock,review,new,banks,creditpay
+import bill,donor,patient,purchase,service,password,printer,editstock,review,new,banks,creditpay,reporter,petty
 import shelve
 import tkMessageBox 
 import connectdb as cdb
@@ -39,10 +39,6 @@ class Dialysis():
 		b.pack(side=LEFT)
 		b.image=photo
 		photo=PhotoImage(file="./images/new.png")
-		b=Button(f,image=photo,text="New",compound=BOTTOM,width=100,height=100,command=lambda:new.adder())
-		b.pack(side=LEFT)
-		b.image=photo
-		photo=PhotoImage(file="./images/service.png")
 		b=Button(f,image=photo,text="Services",compound=BOTTOM,width=100,height=100,command=lambda:service.Inv())
 		b.pack(side=LEFT)
 		b.image=photo
@@ -71,11 +67,14 @@ class Dialysis():
 		viewmenu=Menu(menu,tearoff=0)
 		viewmenu.add_command(label="print stockists list", command=self.liststockists)
 		viewmenu.add_command(label="review bills",command=self.reviewbills)
+		viewmenu.add_command(label="print report",command=lambda:reporter.reporter())
 		menu.add_cascade(label="View",menu=viewmenu)
 
 		taskmenu=Menu(menu,tearoff=0)
+		taskmenu.add_command(label="New",command=lambda:new.adder())
 		taskmenu.add_command(label="Banks",command=lambda:banks.banks())
 		taskmenu.add_command(label="Credit",command=lambda:creditpay.creditpay())
+		taskmenu.add_command(label="Payment",command=lambda:petty.petty())
 		menu.add_cascade(label="Tasks",menu=taskmenu)
 
 		adminmenu=Menu(menu,tearoff=0)

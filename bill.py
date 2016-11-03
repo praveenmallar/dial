@@ -204,24 +204,21 @@ class Bill (Frame):
 			credit=False
 			if self.credit.get()==1:
 				credit=True
-				cur.execute("insert into credit(bill) values(%s);",(billid))
-			if not credit:
-				dayreport.dayrep.receive("bill:"+patient[1],billtotal)
 			donor=None			
 			donor=self.sponsors.get()
-			if donor and not credit:
+			dayreport.dayrep.receive("bill:"+patient[1],billtotal)
+			if donor :
 				donor=donor[1]
-				if not donor[2]>billtotal:
+				if not donor[2]>billtotal and not credit:
 					raise cdb.mdb.Error(420,"not enough donation with the sponsor "+donor[1])
 				cur.execute("update donor set value=%s where id=%s;",(donor[2]-billtotal,donor[0]))
 				cur.execute("insert into sponsorship (donor,bill) values(%s,%s);",(donor[0],billid))
 				donor=donor[1]
 				dayreport.dayrep.spend("spnsr:"+donor,billtotal)
 				billtotal=0
-			if credit:donor=None
 			con.commit()	
 			date=date.strftime("%e-%b-%y")
-			printer.printbill(billid,patient[1],donor,date,billtotal,lines,credit=credit)
+			printer.printbill(billid,patient[1],donor,date,billtotal,lines)
 
 			self.items=[]
 			self.refreshcanvas()
@@ -262,6 +259,12 @@ class Bill (Frame):
 
 	def check_credit(self,event=None):
 		if self.credit.get()==1:
+			donor=self.sponsors.get()
+			if not donor:
+				tmb.showerror("No Donor Selected","Select Donor first",parent=self.master)
+				self.credit.set(0)
+				self.sponsors.focus()
+				return			
 			if not tmb.askyesno("Confirm","make this a credit bill?",parent=self.master):
 				self.credit.set(0)
 

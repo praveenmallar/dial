@@ -81,7 +81,7 @@ class printer:
 		f.write	(output)
 		f.close()
 
-def printbill(billno,patient,sponsor,date,total,items,ip=None,selfbill=0,credit=False):
+def printbill(billno,patient,sponsor,date,total,items,ip=None,selfbill=0):
 	p=printer()
 	if selfbill==1:
 		p.text("selfbill")
@@ -97,7 +97,6 @@ def printbill(billno,patient,sponsor,date,total,items,ip=None,selfbill=0,credit=
 		p.blank()
 		p.text("Bill number: "+str(billno))
 	p.text("Patient: "+patient)
-	if credit:p.text("**CREDIT bill**")	
 	if sponsor:p.text("Sponsor: "+sponsor)
 	if ip:p.text("IP #"+str(ip))
 	p.text("date: "+str(date))
@@ -131,6 +130,37 @@ def printinfo(lines):
 	blines=10-len(lines)
 	if blines>0:	
 		p.blank(blines)
+	p.cut()
+	p.toprinter()
+
+def printreport(reportno, patient, date, items, ip=None):
+	p=printer()
+	p.align_center()
+	p.title()
+	p.text(header[0])
+	p.no_title()
+	p.text(header[1])
+	p.align_left()
+	p.blank(1)
+	p.bold()
+	p.text("Report number: "+str(reportno))
+	p.text("Patient: "+patient)
+	p.no_bold()	
+	p.text("date: "+str(date))
+	p.blank(1)
+	p.align_center()
+	p.bold()
+	p.text("Report:")
+	p.no_bold()
+	p.align_left()
+	p.blank(2)	
+	for item in items:
+		p.text(item)
+		p.blank(1)
+	p.align_right()	
+	p.blank(4)
+	p.text('{:15s}'.format("technician"))
+	p.blank(6)
 	p.cut()
 	p.toprinter()
 

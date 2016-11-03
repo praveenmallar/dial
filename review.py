@@ -45,7 +45,7 @@ class Review (Frame):
 		f=self.f2
 		if f.fr:
 			f.fr.pack_forget()
-		if selection=="sale":
+		if selection=="Bills":
 			f.fr=fr=Frame(f,bd=1)
 			fr.pack(side=TOP,padx=5,pady=5)
 			v1=IntVar()

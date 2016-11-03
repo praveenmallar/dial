@@ -37,7 +37,8 @@ class dayreport:
 			self.receive("opening balance",b)	
 
 	def day_close(self):
-		d=datetime.date.today().strftime("%Y%m%d")
+		day=datetime.date.today()
+		d=day.strftime("%Y%m%d")
 		self.receive("closing balance",0)		
 		cur=self.get(d)
 		if len(cur)>0:
@@ -48,7 +49,8 @@ class dayreport:
 		self.put("closing balance",self.bal)
 		self.rep=[]
 		self.put("dayreport",self.rep)
-		self.print_dayreport(datetime.date.today())
+		self.save_dayreport(day)
+		self.print_dayreport(day)
 		
 	def get(self,var):
 		try:
@@ -63,14 +65,14 @@ class dayreport:
 	def receive(self,head,amount,nocash=False):
 		if not nocash:
 			self.bal+=float(amount)
-		self.rep.append([head,float(amount),self.bal])
+		self.rep.append([head,float(amount),0,self.bal])
 		self.put("balance",self.bal)
 		self.put("dayreport",self.rep)
 
 	def spend(self,head,amount,nocash=False):
 		if not nocash:
 			self.bal-=float(amount)
-		self.rep.append([head,0-float(amount),self.bal])
+		self.rep.append([head,0,float(amount),self.bal])
 		self.put("balance",self.bal)
 		self.put("dayreport",self.rep)
 
@@ -79,8 +81,24 @@ class dayreport:
 		rep=self.get(d)
 		lines=["Day closing report "+d]
 		for r in rep:
-			lines.append( "{:20.20s}{:10.2f}{:10.2f}".format(*r))
+			if r[2]==0:
+				l=[r[0],r[1],r[3]]
+			else:
+				l=[r[0],0-float(r[2]),r[3]]
+			lines.append( "{:20.20s}{:10.2f}{:10.2f}".format(*l))
 		printer.printinfo(lines)
+
+	def save_dayreport(self,day):
+		d=day.strftime("%Y%m%d")
+		d2=day.strftime("%d-%b-%y")
+		filename="dayreports/{} {}.csv".format(d,d2)
+		print filename
+		rep=self.get(d)
+		fil=open(filename,"w")
+		for r in rep:
+			fil.write("{},{},{},{}\n".format(*r))
+		fil.close()
+		
 
 	def print_monthreport(self,day):
 		numdays=calendar.monthrange(day.year,day.month)[1]
