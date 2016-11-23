@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from Tkinter import *
-import bill,donor,patient,purchase,service,password,printer,editstock,review,new,banks,creditpay,reporter,petty
+import bill,donor,patient,purchase,service,password,printer,editstock,review,new,banks,reporter,petty
 import shelve
 import tkMessageBox 
 import connectdb as cdb

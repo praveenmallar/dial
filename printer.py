@@ -108,10 +108,7 @@ def printbill(billno,patient,sponsor,date,total,items,ip=None,selfbill=0):
 	if blanklines>0:
 		p.blank(blanklines)
 	p.bold()
-	if credit:
-		p.text('  {:30s}{:7.2f}'.format("TOTAL: (credit) ",total))
-	else:
-		p.text('  {:30s}{:7.2f}'.format("TOTAL: ",total))
+	p.text('  {:30s}{:7.2f}'.format("TOTAL: ",total))
 	p.no_bold()
 	p.blank(2)
 	p.align_right()	
