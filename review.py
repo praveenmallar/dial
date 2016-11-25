@@ -3,6 +3,9 @@ import printer
 import comp
 import connectdb as cdb
 import tkMessageBox as tmb
+import calpicker as cp
+import dayreport as dr
+import datetime
 
 class Review (Frame):
 	def __init__(self,parent=None,status=0):
@@ -37,28 +40,40 @@ class Review (Frame):
 
 	def packoptions(self):
 		Button(self.f1,text="Sale",command=lambda:self.showOptions("sale")).pack(side=LEFT)
+		Button(self.f1,text="day reports",command=lambda:self.showOptions("dayrep")).pack(side=LEFT)
 
 		if self.status=="admin":
 			Button(self.f1,text="Print",command=self.printlines).pack(side=RIGHT)
+
+
 
 	def showOptions(self,selection):
 		f=self.f2
 		if f.fr:
 			f.fr.pack_forget()
-		if selection=="Bills":
+
+		if selection =="dayrep":
 			f.fr=fr=Frame(f,bd=1)
-			fr.pack(side=TOP,padx=5,pady=5)
-			v1=IntVar()
-			v1.set(0)
-			v2=IntVar()
-			v2.set(0)
-			frr=Frame(fr)
-			frr.pack()
-			Label(frr,text="From").pack(side=LEFT)
-			comp.NumEntry(frr,textvariable=v1,width=8).pack(side=LEFT)
-			Label(frr,text="To").pack(side=LEFT)
-			comp.NumEntry(frr,textvariable=v2,width=8).pack(side=LEFT)
-			Button(frr,text="Show",command=lambda x=v1,y=v2:self.showSale("bills",x,y)).pack(side=LEFT)
+			fr.pack(padx=5,pady=5)
+			Label(fr,text="select date").pack(pady=20)
+			dt=cp.Calbutton(fr)
+			dt.pack()
+			Button(fr,text="Load",command=lambda d=dt:self.showdayrep(dt)).pack(pady=10)
+
+	def showdayrep(self,dt):
+		d=dt.get()
+		day= datetime.datetime.strptime(d,"%d-%b-%y").strftime("%Y%m%d")
+		lines=dr.dayrep.get(day)
+		self.canvas.delete(ALL)
+		i=0
+		self.lines=[]
+		for row in lines:
+			line=" {:30.30s}:  {:10.2f} : {:12.2f}".format(*row)
+			self.lines.append(line)
+			self.canvas.create_text(2,5+i*20,text=line,anchor=NW,font=("FreeMono",10))
+			i+=1
+		self.canvas.config(scrollregion=self.canvas.bbox(ALL))
+		
 	
 	def showSale(self,mode,*args):
 		if mode=="bills":
@@ -67,6 +82,7 @@ class Review (Frame):
 			sql="select bill.id, patient.name as patient, bill.date, bill.amount from bill join patient on bill.patient=patient.id "\
 				" where bill.id>="+str(v1)+" and bill.id<="+str(v2)+" order by bill.id;"
 			self.fillCanvas(sql)
+		
 			
 
 	def fillCanvas(self,sql):
@@ -93,5 +109,6 @@ class Review (Frame):
 			
 	
 if __name__=="__main__":
-	a=Review()
+	t=Tk()	
+	a=Review(t)
 	a.mainloop()

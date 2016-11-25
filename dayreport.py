@@ -61,6 +61,7 @@ class dayreport:
 
 	def put(self,var,val):
 		self.db[var]=val
+		self.db.sync()
 
 	def receive(self,head,amount,nocash=False):
 		if not nocash:

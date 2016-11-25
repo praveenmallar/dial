@@ -17,6 +17,8 @@ class Dialysis():
 		f=Frame(self.master)
 		bill.Bill(f).pack()
 		f.pack()
+		st=balanceFrame(self.master)
+		st.pack(fill=X,expand=1)
 		self.master.mainloop()
 
 	def addshortcuts(self):
@@ -185,6 +187,23 @@ class Dialysis():
 		sh=shelve.open("data.db")
 		sh['noprinter']=self.debug.get()
 
+
+class balanceFrame(Frame):
+	def __init__(self,parent=None):
+		Frame.__init__(self,parent)
+		self.config(bd=4,relief=RIDGE)
+		self.balance=StringVar()
+		l=Label(self,textvariable=self.balance)
+		l.pack(fill=BOTH,expand=1)
+		l.bind("<Button-1>",self.update)
+		self.update()
+		
+	def update(self,e=None):
+		db=shelve.open("dayreport.db")
+		self.balance.set("Balance : "+str(db["balance"]))
+		db.close()
+		self.update_idletasks()
+		self.after(60000,self.update)
 
 if __name__=="__main__":
 	Dialysis()

@@ -32,7 +32,6 @@ class Patient (Frame):
 		Entry(f2,textvariable=self.note).grid(row=3,column=1,padx=5,pady=5)
 		f3=Frame(self)
 		f3.pack(pady=15)
-		Button(f3,text="Delete",command=self.delete).pack(side=LEFT,padx=15)
 		Button(f3,text="Update",command=self.update).pack(side=LEFT,padx=15)
 		Button(f3,text="Add New",command=self.addnew).pack(side=LEFT,padx=15)
 		self.patients.bind("<<listChanged>>",self.patientChanged)
@@ -63,19 +62,6 @@ class Patient (Frame):
 		self.address.set("")
 		self.phone.set("")
 		self.note.set("")
-
-	def delete(self):
-		if self.id:
-			id=self.id
-			name=self.name.get()
-			if not tmb.askyesno("Confirm","Delete Patient {}?".format(name),parent=self.master):
-				return
-			con=cdb.Db().connection()
-			cur=con.cursor()
-			cur.execute("delete from patient where id=%s;",(id))
-			con.commit()
-			tmb.showinfo("Deleted","Patient deleted", parent=self.master)
-			self.fillPatients()
 
 	def update(self):
 		index=self.patients.index()
